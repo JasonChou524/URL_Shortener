@@ -8,6 +8,7 @@ const app = express()
 
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }))
 app.set('view engine', 'hbs')
+app.use(express.static('public'))
 
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
@@ -26,6 +27,10 @@ db.once('open', () => {
 
 app.get('/', (req, res) => {
   res.render('index')
+})
+
+app.get('/output', (req, res) => {
+  res.render('output')
 })
 
 app.listen(3000, () => {
