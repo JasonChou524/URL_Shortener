@@ -2,7 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const exphbs = require('express-handlebars')
 const Url = require('./models/url')
-const randomCode = require('./randomCode')
+const generateRandomCode = require('./generateRandomCode')
 
 require('dotenv').config()
 
@@ -32,13 +32,39 @@ app.get('/', (req, res) => {
   res.render('index')
 })
 
-app.post('/', (req, res) => {
-  const url = req.body.url
-  console.log(`url = ${url}`)
-  const shortenUrl = randomCode(5)
-  return Url.create({ url, short_url: shortenUrl }).then(() => {
-    res.render('output', { shortenUrl })
-  })
+app.post('/', async (req, res) => {
+  try {
+    const url = req.body.url
+    const data = await Url.findOne({ url: url }).lean()
+    let shortenUrl
+    let isExist = 1
+    if (data) {
+      shortenUrl = data.shortenUrl
+    } else {
+      while (isExist) {
+        shortenUrl = generateRandomCode(5)
+        isExist = await Url.exists({ shortenUrl: shortenUrl })
+      }
+      Url.create({ url, shortenUrl })
+    }
+    return res.render('output', { shortenUrl })
+  } catch (err) {
+    console.log(err)
+  }
+})
+
+app.get('/:shortenUrl', (req, res) => {
+  const shortenUrl = req.params.shortenUrl
+  Url.findOne({ shortenUrl })
+    .lean()
+    .then((data) => {
+      if (data) {
+        res.redirect(data.url)
+      } else {
+        res.render('error')
+      }
+    })
+    .catch((error) => console.log(error))
 })
 
 app.listen(3000, () => {

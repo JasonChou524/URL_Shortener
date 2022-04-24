@@ -62,6 +62,10 @@ h2 {
   margin-bottom: 5px;
 }
 
+.error-title {
+  text-align: center;
+}
+
 .short-url {
   font-size: 20px;
   color: #07f;
