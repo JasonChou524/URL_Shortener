@@ -1,14 +1,17 @@
 const express = require('express')
-const dotenv = require('dotenv')
 const mongoose = require('mongoose')
 const exphbs = require('express-handlebars')
+const Url = require('./models/url')
+const randomCode = require('./randomCode')
 
-dotenv.config()
+require('dotenv').config()
+
 const app = express()
 
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }))
 app.set('view engine', 'hbs')
 app.use(express.static('public'))
+app.use(express.urlencoded({ extended: true }))
 
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
@@ -29,8 +32,13 @@ app.get('/', (req, res) => {
   res.render('index')
 })
 
-app.get('/output', (req, res) => {
-  res.render('output')
+app.post('/', (req, res) => {
+  const url = req.body.url
+  console.log(`url = ${url}`)
+  const shortenUrl = randomCode(5)
+  return Url.create({ url, short_url: shortenUrl }).then(() => {
+    res.render('output', { shortenUrl })
+  })
 })
 
 app.listen(3000, () => {
