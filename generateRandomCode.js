@@ -1,4 +1,4 @@
-function randomCode(codeLength) {
+function generateRandomCode(codeLength) {
   const codeArr = [
     '1',
     '2',
@@ -68,8 +68,7 @@ function randomCode(codeLength) {
     const index = Math.floor(Math.random() * codeArr.length)
     randomCode += codeArr[index]
   }
-  console.log(randomCode)
   return randomCode
 }
 
-module.exports = randomCode
+module.exports = generateRandomCode
